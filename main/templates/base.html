@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='utf-8'>
+  <style>
+   {% block style_css %}{% endblock %}
+  </style>
+</head>
+<body>
+  <header>
+
+    {% if user.is_authenticated %}
+      <p>Hi, {{ user.username }}. <a href="{% url 'logout' %}"> Close session</a></p>
+    {% endif %}
+
+
+
+  	{% block encabezado %}{% endblock %}
+
+    {% if user.is_authenticated %}
+  
+    <dd><a href='/moviles_modelo'>List of mobiles by model</a></dd>
+    <dd><a href='/moviles_precio'>List of mobiles by price</a></dd>
+    <dd><a href='/moviles_fecha'>List of mobiles by date</a></dd>
+    <dd><a href='/moviles_puntuacion'>List of mobiles by score</a></dd>
+    <dd><a href='/moviles_capacidad'>List of mobiles by capacity</a></dd>
+    <dd><a href='/moviles_bateria'>List of mobiles by battery</a></dd>
+    <dd><a href='/carga'>Load DB</a></dd>
+    <dd><a href='/favoritos'>My favorites</a></dd>
+    <dd><a href='/recomendaciones'>My recommendations</a></dd>
+  {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="/">Welcome</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/login">Login</a>
+    </li>
+  {% endif %}
+  
+	<hr>
+  </header>
+  <section>
+    {% block contenido %}{% endblock %}
+  </section>
+  {% block pie %}{% endblock %} 
+</body>
+</html>

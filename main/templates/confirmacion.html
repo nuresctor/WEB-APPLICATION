@@ -1,0 +1,15 @@
+
+
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Load database. Confirmation </h1>
+{% endblock %}
+
+  {% block contenido %}
+    <h3>WARNING: This process is slow, deletes the current database and requires internet connection</h3>
+    <form id='formulario' method='post' action=''>{% csrf_token %}
+		<input type="submit" name="Aceptar" value="Confirm">
+		<input type="submit" name="Cancelar" value="Cancel">
+	</form>
+  {% endblock %}

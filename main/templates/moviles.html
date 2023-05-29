@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> List of mobiles </h1>
+{% endblock %}
+
+{% block contenido %}
+
+	    {% if moviles %}
+			<h3>Currently have registered {{ moviles|length }} mobiles</h3>
+
+			<head>
+				<title>Grid de Móviles</title>
+				<style>
+					.grid-container {
+						display: grid;
+						grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+						grid-gap: 20px;
+					}
+					.card {
+						border: 1px solid #ccc;
+						padding: 10px;
+					}
+					.card img {
+						width: 187px;
+						height: auto;
+					}
+				</style>
+			</head>
+			<body>
+				<div class="grid-container" id="mobile-grid">
+					{% for movil in moviles %}
+					<div class="card">
+						<p>Date: {{ movil.fecha }}</p>
+						<p>Model: {{ movil.modelo }}</p>
+						<p>ROM: {{ movil.rom }}</p>
+						<p>RAM: {{ movil.ram }}</p>
+						<p>Battery: {{ movil.bateria }} mAh</p>
+						<p>Score: {{ movil.puntuacion }} ★</p>
+						<p>Price: {{ movil.precio }} €</p>
+						<img src="{{ movil.imagen }}" alt="Imagen del Móvil">
+					</div>
+					{% endfor %}
+				</div>
+			</body>
+
+			</dl>
+
+		{% endif %}
+	</div>
+{% endblock %}

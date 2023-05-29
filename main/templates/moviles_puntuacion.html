@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block encabezado %}
+<h1> Mobile search by score </h1>
+{% endblock %}
+
+{% block contenido %}
+
+    	<form id="formulario" method="post" action=''>{% csrf_token %}
+    		{{formulario}}
+    		<input type='submit' value='Search'/>
+    	</form>
+	    
+	    <hr>
+
+	    {% if moviles %}
+		    <h3> Total mobiles by score:  {{ moviles|length }}</h3>
+
+			<head>
+				<title>Grid de Móviles</title>
+				<style>
+					.grid-container {
+						display: grid;
+						grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+						grid-gap: 20px;
+					}
+					.card {
+						border: 1px solid #ccc;
+						padding: 10px;
+						position: relative;
+					}
+					.card img {
+						width: 187px;
+						height: auto;
+					}
+					.card-footer {
+						position: absolute;
+						top: 0;
+						right: 0;
+					}
+
+					.like-icon {
+
+						cursor: pointer;
+					}
+					.hidden {
+						display: none;
+					}
+					
+				</style>
+			</head>
+			<body>
+				<div class="grid-container" id="mobile-grid">
+					{% for movil in moviles %}
+					<div class="card">
+						<div class="card-footer">
+							{% if movil.id in favoritos %}
+							<span class="like-icon">&#128420;</span> <!-- Icono de corazón lleno -->
+							{% else %}
+							<span class="like-icon">&#129293;</span> <!-- Icono de corazón vacío -->
+							{% endif %}
+						  </div>
+						<p class="hidden">{{movil.id}}</p>
+						<p>Date: {{ movil.fecha }}</p>
+						<p>Model: {{ movil.modelo }}</p>
+						<p>ROM: {{ movil.rom }}</p>
+						<p>RAM: {{ movil.ram }}</p>
+						<p>Battery: {{ movil.bateria }} mAh</p>
+						<p>Score: {{ movil.puntuacion }} ★</p>
+						<p>Price: {{ movil.precio }} €</p>
+						<img src="{{ movil.imagen }}" alt="Imagen del Móvil">
+					</div>
+					{% endfor %}
+				</div>
+			</body>
+
+			</dl>
+    {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const likeIcons = document.querySelectorAll(".like-icon");
+
+            likeIcons.forEach(function(icon) {
+                icon.addEventListener("click", function() {
+                    const movilId = icon.parentNode.parentNode.querySelector("p.hidden").textContent;
+                    console.log(movilId);
+                    fetch(`/toggle-favorito/${movilId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.is_favorito) {
+                                icon.innerHTML = "&#128420;"; // Ícono de corazón lleno
+                            } else {
+                                icon.innerHTML = "&#129293;"; // Ícono de corazón vacío
+                            }
+                        })
+                        .catch(error => console.log(error));
+
+                    icon.classList.toggle("liked");
+                });
+            });
+        });
+    </script>
+{% endblock %}

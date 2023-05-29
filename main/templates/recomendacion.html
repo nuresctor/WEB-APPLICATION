@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<head>
+	<title>Grid de Móviles</title>
+	<style>
+		.grid-container {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			grid-gap: 20px;
+		}
+		.card {
+			border: 1px solid #ccc;
+			padding: 10px;
+		}
+		.card img {
+			width: 187px;
+			height: auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>My favorite mobiles</h1>
+    <div class="grid-container" id="mobile-grid">
+		{% for movil in moviles_favoritos %}
+		<div class="card">
+			<p>Date: {{ movil.fecha }}</p>
+			<p>Model: {{ movil.modelo }}</p>
+			<p>ROM: {{ movil.rom }}</p>
+			<p>RAM: {{ movil.ram }}</p>
+			<p>Battery: {{ movil.bateria }} mAh</p>
+			<p>Score: {{ movil.puntuacion }} ★</p>
+			<p>Price: {{ movil.precio }} €</p>
+			<img src="{{ movil.imagen }}" alt="Imagen del Móvil">
+		</div>
+		{% endfor %}
+	</div>
+
+    <h1>Recommendations based on my favorites</h1>
+
+	<div class="grid-container" id="mobile-grid">
+		{% for movil in moviles_recomendados %}
+		<div class="card">
+			<p>Similarity: {{ movil.similitud }}</p>
+			<p>Date: {{ movil.movil.fecha }}</p>
+			<p>Model: {{ movil.movil.modelo }}</p>
+			<p>ROM: {{ movil.movil.rom }}</p>
+			<p>RAM: {{ movil.movil.ram }}</p>
+			<p>Battery: {{ movil.bateria }} mAh</p>
+			<p>Score: {{ movil.movil.puntuacion }} ★</p>
+			<p>Price: {{ movil.movil.precio }} €</p>
+			<img src="{{ movil.movil.imagen }}" alt="Imagen del Móvil">
+		</div>
+		{% endfor %}
+	</div>
+</body>
+{% endblock %}
