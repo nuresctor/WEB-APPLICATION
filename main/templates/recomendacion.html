@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
+{% block encabezado %}
+<h1> List of recommendations mobiles </h1>
+{% endblock %}
+
 {% block contenido %}
+
 <head>
 	<title>Grid de Móviles</title>
 	<style>
@@ -54,4 +59,5 @@
 		{% endfor %}
 	</div>
 </body>
+
 {% endblock %}

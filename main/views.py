@@ -10,21 +10,32 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from whoosh.index import open_dir
+from whoosh.qparser import QueryParser
+from whoosh.fields import Schema, TEXT
+from whoosh.index import create_in
+import os
+from whoosh.index import open_dir
+from whoosh.qparser import QueryParser
 
 def recomendacion(request):
     lista_favoritos = Movil.objects.filter(id__in=Favorito.objects.filter(user=request.user).values_list('movil', flat=True))
-    lista_moviles_ids = Movil.objects.all()
-    lista_no_favoritos = [elemento for elemento in lista_moviles_ids if elemento not in lista_favoritos]
+    if lista_favoritos:
+        lista_moviles_ids = Movil.objects.all()
+        lista_no_favoritos = [elemento for elemento in lista_moviles_ids if elemento not in lista_favoritos]
 
-    moviles_favoritos = Movil.objects.filter(id__in=lista_favoritos)
-    moviles_recomendados = calcular_recomendaciones(lista_favoritos, lista_no_favoritos)[:3]
+        moviles_favoritos = Movil.objects.filter(id__in=lista_favoritos)
+        moviles_recomendados = calcular_recomendaciones(lista_favoritos, lista_no_favoritos)[:3]
 
-    context = {
-        'moviles_favoritos': moviles_favoritos,
-        'moviles_recomendados': moviles_recomendados,
-    }
+        context = {
+            'moviles_favoritos': moviles_favoritos,
+            'moviles_recomendados': moviles_recomendados,
+        }
 
-    return render(request, 'recomendacion.html', context)
+        return render(request, 'recomendacion.html', context)
+    
+    else:
+        return render(request, 'recomendacion.html')
 
 def calcular_similitud(movil1, movil2):
     similitud = 0.0
@@ -142,7 +153,18 @@ def carga(request):
            
     return render(request, 'confirmacion.html')
 
+def esquema():
+    # Definir el esquema
+    esquema = Schema(modelo=TEXT(stored=True))
+
+    # Crear el índice en un directorio
+    if not os.path.exists("Index"):
+        os.mkdir("Index")
+
+    ix = create_in("Index", schema=esquema)
+
 def inicio(request):
+    #esquema()
     num_moviles=Movil.objects.all().count()
     return render(request,'inicio.html', {'num_moviles':num_moviles})
 
@@ -187,6 +209,47 @@ def buscar_pormodelo(request):
     favoritos = Favorito.objects.filter(user=request.user).values_list('movil', flat=True)
 
     return render(request, 'moviles_modelo.html', {'formulario':formulario, 'moviles':moviles, 'favoritos': favoritos})
+
+def buscar_pormodelo2(request):
+    
+    formulario = BusquedaPorModeloForm()
+    
+    if request.method == 'POST':
+        formulario = BusquedaPorModeloForm(request.POST)
+        
+        if formulario.is_valid():
+            # Obtener el término de búsqueda del formulario
+            termino_busqueda = formulario.cleaned_data['modelo']
+            
+            # Abrir el índice de Whoosh
+            ix = open_dir("Index")
+            
+            # Crear un objeto QueryParser para buscar en el campo 'modelo'
+            parser = QueryParser("modelo", schema=ix.schema)
+            
+            # Parsear el término de búsqueda
+            query = parser.parse(termino_busqueda)
+            
+            # Buscar en el índice utilizando la consulta
+            with ix.searcher() as searcher:
+                results = searcher.search(query)
+                
+                # Obtener los identificadores de los resultados
+                ids_resultados = [int(hit["id"]) for hit in results]
+                
+                # Obtener los objetos Movil correspondientes a los resultados
+                moviles = Movil.objects.filter(id__in=ids_resultados)
+                
+                # Obtener lista de favoritos del usuario
+                favoritos = Favorito.objects.filter(user=request.user).values_list('movil', flat=True)
+                
+                return render(request, 'moviles_modelo.html', {'formulario': formulario, 'moviles': moviles, 'favoritos': favoritos})
+    
+    moviles = Movil.objects.all()
+    favoritos = Favorito.objects.filter(user=request.user).values_list('movil', flat=True)
+    
+    return render(request, 'moviles_modelo.html', {'formulario': formulario, 'moviles': moviles, 'favoritos': favoritos})
+
 
 def buscar_porprecio(request):
     formulario = BusquedaPorPrecioForm()
@@ -274,7 +337,7 @@ def buscar_por_ram(moviles, ram):
 def buscar_por_romram(moviles, rom,ram):
     resultados = []
     for movil in moviles:
-        if int(rom) in movil.rom and int(ram) in movil.ram: 
+        if rom in movil.rom and ram in movil.ram: 
             resultados.append(movil)
     return resultados
 
