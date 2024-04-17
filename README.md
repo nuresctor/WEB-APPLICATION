@@ -1,5 +1,5 @@
 
-# smart-access-to-information
+# POCO FINDER - personal project
 
 Este proyecto personal fue desarrollado para ayudar a un familiar que estaba interesado en adquirir un teléfono móvil de la marca Oppo, pero se encontraba indeciso ante la amplia gama de modelos disponibles. Con el objetivo de proporcionar una solución a esta situación, creé una aplicación web que extrae información detallada sobre los dispositivos móviles Oppo directamente desde su página web oficial.
 
